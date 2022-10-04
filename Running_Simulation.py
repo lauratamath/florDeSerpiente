@@ -1,6 +1,7 @@
 import numpy as np
-from colorama import Fore, Style
+import plotly.express as px
 from matplotlib import pyplot as plt
+from colorama import Fore, Style
 
 class Supermarket():
 
@@ -78,60 +79,81 @@ class Supermarket():
             "en_cola": cliente_TE, "numSolicitudes": numSolicitudes, "setTiempo": setTiempo, "i_llegada": i_llegada, "i_salida": i_salida, "tiempoOcupado": tiempoOcupado
         }
 
+def show_results(FdS):
+    resultados_FdS = FdS.simulate()
+    print(Fore.GREEN + ">>>>>>>  Flor de Septiembre" + Style.RESET_ALL)
+    print(Fore.GREEN + ">>>>>>>  6 solicitudes máximas" + Style.RESET_ALL)
+    print(Fore.GREEN + ">>>>>>>  9 cajas en total" + Style.RESET_ALL)
+    print(Fore.GREEN + ">>>>>>>  Simulación de 8 horas laborales" + Style.RESET_ALL + '\n')
 
-counter = 9 # Numero de cajas
+    print("1. En promedio ¿cuánto tiempo estuvo cada cliente en cola?")
+    print(np.round(np.mean(resultados_FdS["en_cola"]),5), "min")
 
-# ## Pizzita Computing
-FdS = Supermarket(max_sol=6, cajas=counter)
-resultados_FdS = FdS.simulate()
-print(Fore.GREEN + ">>>>>>>  Flor de Septiembre" + Style.RESET_ALL)
-print(Fore.GREEN + ">>>>>>>  6 solicitudes máximas" + Style.RESET_ALL)
-print(Fore.GREEN + ">>>>>>>  9 cajas en total" + Style.RESET_ALL)
-print(Fore.GREEN + ">>>>>>>  Simulación de 8 horas laborales" + Style.RESET_ALL + '\n')
+    print("2. Número de cliente en la cola")
+    print(resultados_FdS["numSolicitudes"], "min")
 
-print("1. En promedio ¿cuánto tiempo estuvo cada cliente en cola?")
-print(np.round(np.mean(resultados_FdS["en_cola"]),5), "min")
+    clientsPerCashier = resultados_FdS["numSolicitudes"]
+    totalClients = 0
+    useIndex = []
 
-print("2. Número de cliente en la cola")
-print(resultados_FdS["numSolicitudes"], "min")
+    for cli in range(len(clientsPerCashier)):
+        print('Caja ', cli+1, ': ', str(clientsPerCashier[cli]), 'clientes')
+        totalClients += clientsPerCashier[cli]
 
-clientsPerCashier = resultados_FdS["numSolicitudes"]
-totalClients = 0
-useIndex = []
+    for i in range(len(clientsPerCashier)):
+        useIndex.append(clientsPerCashier[i] / totalClients)
 
-for cli in range(len(clientsPerCashier)):
-    print('Caja ', cli+1, ': ', str(clientsPerCashier[cli]), 'clientes')
-    totalClients += clientsPerCashier[cli]
+    print("3. Calcule el grado de utilización de cada cajero")
 
-for i in range(len(clientsPerCashier)):
-    useIndex.append(clientsPerCashier[i] / totalClients)
+    for i in range(len(useIndex)):
+        print('Rendimiento de caja ', i+1, ': ', str(useIndex[i]))
 
+    plt.bar(range(1, len(clientsPerCashier) + 1), useIndex)
+    plt.title('Rendimiento de caja')
+    plt.xlabel('Caja')
+    plt.ylabel('Porcentaje de solicitudes de cajero')
+    plt.show()
 
-print("3. Calcule el grado de utilización de cada cajero")
+    # Grafica de tiempo de la simulacion
+    len_min = min(len(resultados_FdS["i_llegada"]), len(resultados_FdS["i_salida"]))
+    figure = px.scatter(x=resultados_FdS["i_llegada"][:len_min], y=resultados_FdS["i_salida"][:len_min], title="Tiempo de simulación")
+    figure.show()
 
-for i in range(len(useIndex)):
-    print('Rendimiento de caja ', i+1, ': ', str(useIndex[i]))
+    # print(resultados_FdS["tiempoOcupado"][0], "min")
+    # print("\n3. ¿Cuánto tiempo estuvo cada cajas desocupado (idle)?")
+    # print(np.maximum(np.ones(FdS.cajas)*60 - resultados_FdS["tiempoOcupado"],0)[0], "min")
+    # print("\n4. Cuánto tiempo en total estuvieron las solicitudes en cola?")
+    # print(np.round(sum(resultados_FdS["en_cola"]),5), "min")
 
-    
-plt.bar(range(1, len(clientsPerCashier) + 1), useIndex)
-plt.title('Rendimiento de caja')
-plt.xlabel('Caja')
-plt.ylabel('Porcentaje de solicitudes de cajero')
-plt.show()
+    # print("\n6. En promedio, ¿cuántas solicitudes estuvieron en cola cada minuto?")
+    # sol_psec = [ 1/num if num != 0 else 0 for num in resultados_FdS["en_cola"] ]
+    # print(np.round(np.mean(sol_psec),5), "min")
+    # print("\n7. ¿Cuál es el momento de la salida de la última solicitud?")
+    # print(np.round(resultados_FdS["setTiempo"][-1],5), "min")
 
+def show_mult_results(FdSs):
+    # comparacion clientes en cola
+    clients_queue = [np.round(np.mean(result["en_cola"]),5) for result in FdSs]
+    figure = px.bar(x=clients_queue, y=[f"{results['cajas']} cajas y {results['max_sol']} max_sol" for results in FdSs] , title="Tiempos promedio de clientes en cola para cada simulación")
+    figure.show()
 
+def main():
+    counter = 9 # Numero de cajas
 
+    # ## Pizzita Computing
+    FdS = Supermarket(max_sol=6, cajas=counter)
+    show_results(FdS)
 
-# print(resultados_FdS["tiempoOcupado"][0], "min")
-# print("\n3. ¿Cuánto tiempo estuvo cada cajas desocupado (idle)?")
-# print(np.maximum(np.ones(FdS.cajas)*60 - resultados_FdS["tiempoOcupado"],0)[0], "min")
-# print("\n4. Cuánto tiempo en total estuvieron las solicitudes en cola?")
-# print(np.round(sum(resultados_FdS["en_cola"]),5), "min")
+    # Resultados para diferentes valores de cajas
+    valores = [ { "cajas": 7, "max_sol": 4 }, { "cajas": 8, "max_sol": 5 },  { "cajas": 9, "max_sol": 6 },  { "cajas": 10, "max_sol": 7 } ]
+    mult_results = []
+    for val in valores:
+        FdS = Supermarket(max_sol=val["max_sol"], cajas=val["cajas"])
+        results = FdS.simulate()
+        results["cajas"] = val["cajas"]
+        results["max_sol"] = val["max_sol"]
+        mult_results.append(results)
+    show_mult_results(mult_results)
 
-# print("\n6. En promedio, ¿cuántas solicitudes estuvieron en cola cada minuto?")
-# sol_psec = [ 1/num if num != 0 else 0 for num in resultados_FdS["en_cola"] ]
-# print(np.round(np.mean(sol_psec),5), "min")
-# print("\n7. ¿Cuál es el momento de la salida de la última solicitud?")
-# print(np.round(resultados_FdS["setTiempo"][-1],5), "min")
-
-    
+if __name__ == "__main__":
+    main()
