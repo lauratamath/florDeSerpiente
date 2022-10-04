@@ -1,5 +1,6 @@
 import numpy as np
 from colorama import Fore, Style
+from matplotlib import pyplot as plt
 
 class Supermarket():
 
@@ -111,6 +112,16 @@ print("3. Calcule el grado de utilización de cada cajero")
 for i in range(len(useIndex)):
     print('Rendimiento de caja ', i+1, ': ', str(useIndex[i]))
 
+    
+plt.bar(range(1, len(clientsPerCashier) + 1), useIndex)
+plt.title('Rendimiento de caja')
+plt.xlabel('Caja')
+plt.ylabel('Porcentaje de solicitudes de cajero')
+plt.show()
+
+
+
+
 # print(resultados_FdS["tiempoOcupado"][0], "min")
 # print("\n3. ¿Cuánto tiempo estuvo cada cajas desocupado (idle)?")
 # print(np.maximum(np.ones(FdS.cajas)*60 - resultados_FdS["tiempoOcupado"],0)[0], "min")
@@ -123,3 +134,4 @@ for i in range(len(useIndex)):
 # print("\n7. ¿Cuál es el momento de la salida de la última solicitud?")
 # print(np.round(resultados_FdS["setTiempo"][-1],5), "min")
 
+    
