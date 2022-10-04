@@ -46,8 +46,9 @@ class Store:
                     if cajases[i] == 0: 
                         cliente_TE = np.append(cliente_TE,t - i_llegada[len(i_llegada)-1])
                         cajasNo.append(i)
-                        setTiempo[i] = t + np.random.exponential(1) 
-                        tiempoOcupado[i] += setTiempo[i]-t 
+                        setTiempo[i] = t + np.random.exponential(25)
+                        tiempoOcupado[i] += setTiempo[i]-t
+                        
                         cajases[i] = 1 
                         break;
             n += 1 # Se agrega al nuevo cliente en el sistema
@@ -64,7 +65,7 @@ class Store:
                 cajasNo.append(cajasPED) 
                 cliente_TE = np.append(cliente_TE,t - i_llegada[len(i_llegada)-1])
 
-                setTiempo[i] = t + np.random.exponential(1) 
+                setTiempo[i] = t + np.random.exponential(25)
 
                 tiempoOcupado[cajasPED] += setTiempo[cajasPED]-t
                 cajases[i] = 1 
