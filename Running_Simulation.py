@@ -85,20 +85,41 @@ FdS = Supermarket(max_sol=6, cajas=counter)
 resultados_FdS = FdS.simulate()
 print(Fore.GREEN + ">>>>>>>  Flor de Septiembre" + Style.RESET_ALL)
 print(Fore.GREEN + ">>>>>>>  6 solicitudes máximas" + Style.RESET_ALL)
-print(Fore.GREEN + ">>>>>>>  Simulación de 8 horas laborales" + Style.RESET_ALL)
-print("1. ¿Cuántas solicitudes atendió cada cajas?")
-print(resultados_FdS["numSolicitudes"][0], "min")
-print("\n2. ¿Cuánto tiempo estuvo cada cajas ocupado?")
-print(resultados_FdS["tiempoOcupado"][0], "min")
-print("\n3. ¿Cuánto tiempo estuvo cada cajas desocupado (idle)?")
-print(np.maximum(np.ones(FdS.cajas)*60 - resultados_FdS["tiempoOcupado"],0)[0], "min")
-print("\n4. Cuánto tiempo en total estuvieron las solicitudes en cola?")
-print(np.round(sum(resultados_FdS["en_cola"]),5), "min")
-print("\n5. En promedio ¿cuánto tiempo estuvo cada solicitud en cola?")
+print(Fore.GREEN + ">>>>>>>  9 cajas en total" + Style.RESET_ALL)
+print(Fore.GREEN + ">>>>>>>  Simulación de 8 horas laborales" + Style.RESET_ALL + '\n')
+
+print("1. En promedio ¿cuánto tiempo estuvo cada cliente en cola?")
 print(np.round(np.mean(resultados_FdS["en_cola"]),5), "min")
-print("\n6. En promedio, ¿cuántas solicitudes estuvieron en cola cada minuto?")
-sol_psec = [ 1/num if num != 0 else 0 for num in resultados_FdS["en_cola"] ]
-print(np.round(np.mean(sol_psec),5), "min")
-print("\n7. ¿Cuál es el momento de la salida de la última solicitud?")
-print(np.round(resultados_FdS["setTiempo"][-1],5), "min")
+
+print("2. Número de cliente en la cola")
+print(resultados_FdS["numSolicitudes"], "min")
+
+clientsPerCashier = resultados_FdS["numSolicitudes"]
+totalClients = 0
+useIndex = []
+
+for cli in range(len(clientsPerCashier)):
+    print('Caja ', cli+1, ': ', str(clientsPerCashier[cli]), 'clientes')
+    totalClients += clientsPerCashier[cli]
+
+for i in range(len(clientsPerCashier)):
+    useIndex.append(clientsPerCashier[i] / totalClients)
+
+
+print("3. Calcule el grado de utilización de cada cajero")
+
+for i in range(len(useIndex)):
+    print('Rendimiento de caja ', i+1, ': ', str(useIndex[i]))
+
+# print(resultados_FdS["tiempoOcupado"][0], "min")
+# print("\n3. ¿Cuánto tiempo estuvo cada cajas desocupado (idle)?")
+# print(np.maximum(np.ones(FdS.cajas)*60 - resultados_FdS["tiempoOcupado"],0)[0], "min")
+# print("\n4. Cuánto tiempo en total estuvieron las solicitudes en cola?")
+# print(np.round(sum(resultados_FdS["en_cola"]),5), "min")
+
+# print("\n6. En promedio, ¿cuántas solicitudes estuvieron en cola cada minuto?")
+# sol_psec = [ 1/num if num != 0 else 0 for num in resultados_FdS["en_cola"] ]
+# print(np.round(np.mean(sol_psec),5), "min")
+# print("\n7. ¿Cuál es el momento de la salida de la última solicitud?")
+# print(np.round(resultados_FdS["setTiempo"][-1],5), "min")
 
