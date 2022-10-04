@@ -116,7 +116,7 @@ def show_results(FdS):
 
     # Grafica de tiempo de la simulacion
     len_min = min(len(resultados_FdS["i_llegada"]), len(resultados_FdS["i_salida"]))
-    figure = px.scatter(x=resultados_FdS["i_llegada"][:len_min], y=resultados_FdS["i_salida"][:len_min], title="Tiempo de simulación")
+    figure = px.scatter(x=resultados_FdS["i_llegada"][:len_min], y=resultados_FdS["i_salida"][:len_min], title="Tiempo de simulación", labels={"x": "Tiempo Llegada", "y": "Tiempo Salida"})
     figure.show()
 
     # print(resultados_FdS["tiempoOcupado"][0], "min")
